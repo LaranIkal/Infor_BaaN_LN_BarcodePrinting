@@ -1,0 +1,53 @@
+|******************************************************************************
+|* Title	: tccomprintlbs - Device to print labels 
+|* by using ttstpconv and external program
+|* Author	: Carlos Kassab
+|* Date		: March,03,2015
+|*
+|* B61Caprod  April 29 2019 ckassab |#042919
+|* Add code to get the printer brand from the device arguments
+|******************************************************************************
+|* Script Type	: 3GL
+|****************************** DECLARATION SECTION ***************************
+
+	extern	domain	tcmcs.str132	spool_file_name, program_name
+	extern	domain	tcmcs.str132	prog_arguments
+
+	extern	domain	tcmcs.long		retval
+	extern	domain	tcmcs.long		fileid1
+	extern	domain	tcmcs.long		err
+	extern	string  file_type(33), print_queue(100)
+	extern	string  printer_brand(100) |#042919.new
+	
+	#pragma used dll ottdllbw
+	|#include <bic_tt>
+	| #include <bic_desktop>
+	
+function main()
+{
+	| message(argv$(3)) | It contains the file type and the printer queue
+
+	string.scan(argv$(3), "%s|%s|%s", file_type, print_queue, printer_brand )
+	
+	spool_file_name = creat.tmp.file$( bse.tmp.dir$() )
+	program_name = "E:\Labels\PrintBarCodeLabelWithLogo.exe"
+	prog_arguments = "E:\Labels\CompanyLogo.prn " & spool_file_name
+	prog_arguments = prog_arguments & " " & print_queue
+	
+	| Convert the report file into the temp file.
+	retval = wait.and.activate("ttstpconv", argv$(1), spool_file_name, file_type, argv$(4))
+		| ttstpconv is a conversion program in BaaN/LN tools.
+		| Arguments are passed from BaaN/LN:	
+		|    1 = Name of input (temporary) file contain dev independent report
+		|    2 = Name of output file ===>>> spool_file_name
+		|    3 = Additional arguments (from Device data) ===>>> file_type
+		|    4 = Specilar parm for ttstpconv (unknown reason)	
+	
+	|Set the company logo and send file to the printer
+	retval = run.prog(program_name, prog_arguments, RP_WAIT)
+	
+	retval = seq.unlink(spool_file_name)
+}
+
+
+
