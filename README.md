@@ -1,6 +1,9 @@
 # Infor_BaaN_LN_BarcodePrinting
 
-With 15+ Years on Infor BaaN/LN, I created:
+Printing from Infor LN CloudSuite?, we have a solution, will be published to:
+https://github.com/LaranIkal/barcodeprintingutility
+
+With 15+ Years on Infor BaaN/LN, we created:
 
 Barcode Design In BarTender And Printing From Infor BaaN/LN
 
